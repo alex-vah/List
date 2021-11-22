@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,21 +7,20 @@ using System.Threading.Tasks;
 
 namespace List
 {
-    public class _List
+    public class _List<T>:IEnumerable
     {
         private const int _defaultCapacity = 4;
 
-        private int[] _items;
+        private T[] _items;
         private int _size;
         private int _version;
 
-        static readonly int[] _emptyArray = new int[0];
+        static readonly T[] _emptyArray = new T[0];
 
         public _List()
         {
             _items = _emptyArray;
         }
-
         public _List(int capacity)
         {
             if (capacity < 0)
@@ -33,7 +33,7 @@ namespace List
             }
             else
             {
-                _items = new int[capacity];
+                _items = new T[capacity];
             }
         }
         public int Capacity
@@ -52,7 +52,7 @@ namespace List
                 {
                     if (value > 0)
                     {
-                        int[] newItems = new int[value];
+                        T[] newItems = new T[value];
                         if (_size > 0)
                         {
                             Array.Copy(_items, 0, newItems, 0, _size);
@@ -73,7 +73,7 @@ namespace List
                 return _size;
             }
         }
-        public int this[int index]
+        public T this[int index]
         {
             get
             {
@@ -118,8 +118,7 @@ namespace List
 
             }
         }
-
-        public void Add(int item)
+        public void Add(T item)
         {
             if (_size == _items.Length)
             {
@@ -137,13 +136,13 @@ namespace List
             }
             _version++;
         }
-        public bool Contains(int item)
+        public bool Contains(T item)
         {
-            if (item == (int)default)
+            if ((object)item == null)
             {
                 for (int i = 0; i < _size; i++)
                 {
-                    if (_items[i] == (int)default)
+                    if ((object)_items[i] == null)
                     {
                         return true;
                     }
@@ -194,7 +193,7 @@ namespace List
             }
             return Array.IndexOf(_items, item, index, count);
         }
-        public void Insert(int index, int item)
+        public void Insert(int index, T item)
         {
             if (index > _size)
             {
@@ -233,7 +232,7 @@ namespace List
             {
                 Array.Copy(_items, index + 1, _items, index, _size - index);
             }
-            _items[_size] = default(int);
+            _items[_size] = default(T);
             _version++;
         }
         public void RemoveRange(int index,int count)
@@ -263,5 +262,39 @@ namespace List
                 _version++;
             }
         }
+
+        public IEnumerator GetEnumerator()
+        {
+            return new _ListEnumerator(_items, _size);
+        }
+        public class _ListEnumerator:IEnumerator
+        {
+            public T[] _items;
+            public int _count;
+            public int _size;
+            public _ListEnumerator(T [] items, int size)
+            {
+                _items = items;
+                _size = size;
+            }
+            public object Current
+            {
+                get
+                {
+                    return _items[_count++];
+                } 
+            }
+            public bool MoveNext()
+            {
+                return _size > _count;
+            }
+            public void Reset()
+            {
+                throw new NotImplementedException();
+            }
+        }
+            
+
+        
     }
 }
